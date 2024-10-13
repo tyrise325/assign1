@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Net Blogs</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        h2 {
+            color: #4CAF50;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        input, textarea, button, select {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        a {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+
+        a:hover {
+            color: #388E3C;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+
+        #postList {
+            list-style: none;
+            padding: 0;
+        }
+
+        #postList li {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4CAF50;
+        }
+
+        .delete-btn, .edit-btn {
+            margin-right: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .edit-btn {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background-color: #21618C;
+        }
+
+        .comment-section {
+            margin-top: 15px;
+        }
+
+        .comment {
+            margin-left: 20px;
+            font-style: italic;
+            color: #555;
+        }
+
+        .auth-section {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .auth-section h2 {
+            color: #fff;
+        }
+
+        .auth-section input, .auth-section button {
+            background-color: #fff;
+            color: #333;
+        }
+
+        .auth-section button {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .auth-section button:hover {
+            background-color: #45a049;
+        }
+
+        .comment-box {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        #commentContent {
+            width: 100%;
+            border: none;
+            padding: 10px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Net Blogs Application</h1>
+    <h3 style="text-align:center;">Note that all malicious posts will be removed</h3>
+
+    <div class="container">
+        <!-- Guest Posting Section -->
+        <div id="guest-post-section">
+            <h2>Guest User - Create a Post</h2>
+            <textarea id="guestPostContent" placeholder="Write your post here..."></textarea>
+            <button onclick="submitGuestPost()">Submit Guest Post</button>
+        </div>
+
+        <!-- Simple Register/Login System -->
+        <div class="auth-section" id="auth-section">
+            <h2>Login/Register</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="register()">Register</button>
+            <button onclick="login()">Login</button>
+            <button onclick="resetPassword()">Reset Password</button>
+            <p class="error" id="auth-error"></p>
+        </div>
+
+        <!-- User Blog Section -->
+        <div id="blog-section" style="display:none;">
+            <h2>Welcome, <span id="currentUser"></span>!</h2>
+            <a href="#" onclick="logout()">Logout</a>
+            <button onclick="exitApp()">Exit</button>
+
+            <!-- User Profile Management Section -->
+            <div id="profileSection">
+                <h2>Profile Management</h2>
+                <button onclick="deleteAccount()">Delete Account</button>
+            </div>
+
+            <!-- Registered User Post Section -->
+            <div id="userPostSection">
+                <h2>Create a Post</h2>
+                <textarea id="postContent" placeholder="Write your post here..."></textarea>
+                <button onclick="submitPost()">Submit Post</button>
+            </div>
+
+            <h2>All Posts</h2>
+            <!-- Dropdown Menu for All Users -->
+            <select id="postDropdown" onchange="displaySelectedPost()">
+                <option value="">Select a post to view comments</option>
+            </select>
+
+            <div id="selectedPost" style="display:none;">
+                <h3>Post Details</h3>
+                <p id="postDetail"></p>
+                <div class="comment-section">
+                    <h4>Comments</h4>
+                    <div class="comment-box">
+                        <textarea id="commentContent" placeholder="Add a comment..."></textarea>
+                        <button onclick="submitComment()">Submit Comment</button>
+                    </div>
+                    <div id="commentList"></div>
+                </div>
+            </div>
+
+            <ul id="postList"></ul>
+        </div>
+    </div>
+
+    <script>
+        // Load data from localStorage
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const posts = JSON.parse(localStorage.getItem('posts')) || [];
+        let currentUser = null;
+        let editIndex = null; // Track which post is being edited
+
+        // Register New Users
+        function register() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDisplay = document.getElementById('auth-error');
+
+            // Check if the username is already taken
+            const existingUser = users.find(u => u.username === username);
+            if (existingUser) {
+                errorDisplay.innerText = 'Username already exists.';
+                return;
+            }
+
+            // Simple validation
+            if (username && password) {
+                users.push({ username, password });
+                localStorage.setItem('users', JSON.stringify(users)); // Save to localStorage
+                alert('User registered. Now you can log in.');
+                errorDisplay.innerText = ''; // Clear any previous errors
+            } else {
+                errorDisplay.innerText = 'Please enter a valid username and password.';
+            }
+        }
+
+        // Login Function
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDisplay = document.getElementById('auth-error');
+
+            // Simulated user authentication
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                currentUser = user;
+                showBlogSection();
+                errorDisplay.innerText = ''; // Clear errors
+            } else {
+                errorDisplay.innerText = 'Invalid username or password.';
+            }
+        }
+
+        // Reset Password Function
+        function resetPassword() {
+            const username = document.getElementById('username').value;
+            const newPassword = prompt('Enter your new password:');
+
+            const userIndex = users.findIndex(u => u.username === username);
+            if (userIndex !== -1) {
+                users[userIndex].password = newPassword;
+                localStorage.setItem('users', JSON.stringify(users)); // Save updated password
+                alert('Password updated successfully.');
+            } else {
+                alert('User not found.');
+            }
+        }
+
+        // Show Blog Section
+        function showBlogSection() {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('blog-section').style.display = 'block';
+            document.getElementById('currentUser').innerText = currentUser.username;
+        }
+
+        // Logout
+        function logout() {
+            currentUser = null;
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('blog-section').style.display = 'none';
+        }
+
+        // Submit post as guest
+        function submitGuestPost() {
+            const content = document.getElementById('guestPostContent').value;
+
+            if (content) {
+                const newPost = {
+                    user: "Guest",
+                    content,
+                    comments: [],
+                    timestamp: new Date().toLocaleString()
+                };
+                posts.push(newPost);
+                localStorage.setItem('posts', JSON.stringify(posts));
+                displayPosts();
+                populatePostDropdown();
+                document.getElementById('guestPostContent').value = ''; // Clear input field
+            }
+        }
+
+        // Submit post as a logged-in user
+        function submitPost() {
+            const content = document.getElementById('postContent').value;
+
+            if (content && currentUser) {
+                const newPost = {
+                    user: currentUser.username,
+                    content,
+                    comments: [],
+                    timestamp: new Date().toLocaleString()
+                };
+                posts.push(newPost);
+                localStorage.setItem('posts', JSON.stringify(posts));
+                displayPosts();
+                populatePostDropdown();
+                document.getElementById('postContent').value = ''; // Clear input field
+            }
+        }
+
+        // Delete a post
+        function deletePost(index) {
+            if (confirm("Are you sure you want to delete this post?")) {
+                posts.splice(index, 1); // Remove post
+                localStorage.setItem('posts', JSON.stringify(posts)); // Save updated posts to localStorage
+                displayPosts();
+                populatePostDropdown();
+            }
+        }
+
+        // Delete user account and their posts
+        function deleteAccount() {
+            if (confirm("Are you sure you want to delete your account? This will remove all your posts as well.")) {
+                // Remove user's posts
+                for (let i = posts.length - 1; i >= 0; i--) {
+                    if (posts[i].user === currentUser.username) {
+                        posts.splice(i, 1); // Delete the post
+                    }
+                }
+
+                // Remove user account
+                const userIndex = users.findIndex(u => u.username === currentUser.username);
+                if (userIndex !== -1) {
+                    users.splice(userIndex, 1);
+                }
+
+                localStorage.setItem('users', JSON.stringify(users)); // Save updated users list
+                localStorage.setItem('posts', JSON.stringify(posts)); // Save updated posts list
+
+                // Logout the user
+                logout();
+                alert("Your account and all related posts have been deleted.");
+            }
+        }
+
+        // Display all posts
+        function displayPosts() {
+            const postList = document.getElementById('postList');
+            postList.innerHTML = ''; // Clear current posts
+
+            posts.forEach((post, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <strong>${post.user}</strong>: ${post.content} <br>
+                    <small><em>Posted on: ${post.timestamp}</em></small>
+                    <button class="edit-btn" onclick="editPost(${index})">Edit</button>
+                    <button class="delete-btn" onclick="deletePost(${index})">Delete</button>
+                `;
+                postList.appendChild(listItem);
+            });
+        }
+
+        // Populate dropdown with posts for commenting
+        function populatePostDropdown() {
+            const postDropdown = document.getElementById('postDropdown');
+            postDropdown.innerHTML = '<option value="">Select a post to view comments</option>'; // Clear dropdown
+
+            posts.forEach((post, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.innerText = `${post.user}'s Post`;
+                postDropdown.appendChild(option);
+            });
+        }
+
+        // Display selected post and comments
+        function displaySelectedPost() {
+            const postDropdown = document.getElementById('postDropdown');
+            const selectedIndex = postDropdown.value;
+
+            if (selectedIndex !== "") {
+                const post = posts[selectedIndex];
+                document.getElementById('postDetail').innerHTML = `
+                    ${post.content} <br>
+                    <small><em>Posted on: ${post.timestamp}</em></small>
+                `;
+                document.getElementById('commentList').innerHTML = ''; // Clear existing comments
+                post.comments.forEach(comment => {
+                    const commentItem = document.createElement('div');
+                    commentItem.classList.add('comment');
+                    commentItem.innerText = comment;
+                    document.getElementById('commentList').appendChild(commentItem);
+                });
+                document.getElementById('selectedPost').style.display = 'block'; // Show selected post section
+            } else {
+                document.getElementById('selectedPost').style.display = 'none'; // Hide if nothing is selected
+            }
+        }
+
+        // Submit comment on selected post
+        function submitComment() {
+            const postDropdown = document.getElementById('postDropdown');
+            const selectedIndex = postDropdown.value;
+            const commentContent = document.getElementById('commentContent').value;
+
+            if (selectedIndex !== "" && commentContent) {
+                posts[selectedIndex].comments.push(commentContent);
+                localStorage.setItem('posts', JSON.stringify(posts)); // Save comments to localStorage
+                displaySelectedPost(); // Refresh post and comments
+                document.getElementById('commentContent').value = ''; // Clear comment input
+            }
+        }
+
+        function escapeHTML(content) {
+            const div = document.createElement('div');
+            div.innerText = content;
+            return div.innerHTML;
+        }
+        // Use escapeHTML for all dynamic content rendering.
+        post.content = escapeHTML(post.content);
+
+        // Automatically populate posts and comments when page loads
+        window.onload = function() {
+            displayPosts();
+            populatePostDropdown();
+        };
+    </script>
+</body>
+</html>
